@@ -1,8 +1,12 @@
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 
 public class Main {
 
     public static void main(String[] args) {
+        var start = Instant.now();
+
         var argmap = readArguments(args);
         var path = argmap.get("path");
         var extensions = argmap.get("ext");
@@ -11,6 +15,10 @@ public class Main {
         var scanner = new DirectoryScanner(path, extensions, threads);
         var result = scanner.getCounter();
         System.out.println("The total SLOC is: " + result + " lines.");
+
+        var finish = Instant.now();
+        var elapsed = Duration.between(start, finish);
+        System.out.println("Time elapsed: " + elapsed.toMillis() + "ms");
         System.exit(0);
     }
 
@@ -32,9 +40,11 @@ public class Main {
             if (current.startsWith("--") && current.length() > 2) {
                 var argname = current.substring(2);
                 pointer++;
-                var argvalue = args[pointer];
-                pointer++;
-                output.put(argname, argvalue);
+                if (pointer < args.length) {
+                    var argvalue = args[pointer];
+                    pointer++;
+                    output.put(argname, argvalue);
+                }
             } else pointer++;
         }
         return output;
